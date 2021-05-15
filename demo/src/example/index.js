@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { Redirect } from 'react-router';
 import styled from 'styled-components';
 
 import EmailEditor from '../../../src';
@@ -13,11 +14,12 @@ height: 100%;
 
 const Bar = styled.div `
 flex: 1;
-background-color: #61dafb;
+background-color: #5deba1;
 color: #000;
 padding: 10px;
 display: flex;
 max-height: 40px;
+
 
 h1 {
 flex: 1;
@@ -61,10 +63,43 @@ const Popbox = styled.div `
     top: 25%;
     bottom: 25%;
     margin: auto;
+    
+    color:#fff;
+    font-size: 12px;
+    
+  }
+
+  textarea{
+    position: absolute;
+    
+    top: 0%;
+    bottom: 0%;
+    margin: auto;
     background: #222;
     color:#fff;
     font-size: 12px;
     overflow: auto;
+    width: 100%;
+    height:100%;
+  }
+  .copyBtn{
+    
+    flex: 1;
+    padding: 10px;
+    background: none;
+    font-size: 20px;
+    color: white;
+    position: absolute;
+    top: 80%;
+    right:25%;
+    cursor: pointer;
+    border: 2px solid white;
+    border-radius: 5px;
+  }
+
+  .copyBtn: hover{
+    color: black;
+    border: 2px solid black;
   }
 
   .closebtn{
@@ -83,59 +118,80 @@ const Popbox = styled.div `
 
 const Example = (props) => {
 
-const emailEditorRef = useRef(null);
+    const emailEditorRef = useRef(null);
 
 
 
-const closebtn = ()=>{
-  const cls = document.getElementById("popup").style.display = "none";
-}
-const exportHtml = () => {
-emailEditorRef.current.editor.exportHtml((data) => {
-const { design, html } = data;
-console.log('exportHtml', html);
-const cls = document.getElementById("popup").style.display = "block";
+    const closebtn = () => {
+        const cls = document.getElementById("popup").style.display = "none";
+    }
 
-const htmlcon = document.getElementById("htmlcon");
+    const composebtn = ()=>{
+        window.location.href = "http://localhost:3002/";
+    }
+    const copyCode = ()=>{
+        const htmlcon = document.getElementById("htmlcon");
+        htmlcon.select();
+        document.execCommand("copy");
+        alert("Html copied succesfully.");
 
-htmlcon.innerText = html; 
-//alert('Output HTML has been logged in your developer console.');
-});
-};
+    }
+    const exportHtml = () => {
+        emailEditorRef.current.editor.exportHtml((data) => {
+            const { design, html } = data;
+            console.log('exportHtml', html);
+            const cls = document.getElementById("popup").style.display = "block";
 
-const onDesignLoad = (data) => {
-console.log('onDesignLoad', data);
-};
+            const htmlcon = document.getElementById("htmlcon");
 
-const onLoad = () => {
-emailEditorRef.current.editor.addEventListener(
-'onDesignLoad',
-onDesignLoad
-);
-emailEditorRef.current.editor.loadDesign(sample);
-};
+            
+            htmlcon.value = html;
+            //alert('Output HTML has been logged in your developer console.');
+        });
+    };
 
-return ( <Container>
-    <Bar>
+    const onDesignLoad = (data) => {
+        console.log('onDesignLoad', data);
+    };
+
+    const onLoad = () => {
+        emailEditorRef.current.editor.addEventListener(
+            'onDesignLoad',
+            onDesignLoad
+        );
+        emailEditorRef.current.editor.loadDesign(sample);
+    };
+
+    return ( <Container>
+        <Bar>
         <h1> Email Editor. </h1>
 
-        <button onClick={ exportHtml }> Export HTML </button>
-    </Bar>
+        <button onClick = { exportHtml } > Export HTML </button> 
+        <button onClick = { composebtn } > Go to Compose Email </button> 
+        </Bar>
 
-      <Popbox>
-      <div id='popup'>
-      <button onClick={ closebtn } className="closebtn">X</button>
-        <div className='popup_inner'>
-          <div id="htmlcon"></div>
+        <Popbox >
+        <div id = 'popup' >
+        <button onClick = { closebtn }
+        className = "closebtn" > X </button> 
+        
+        <div className = 'popup_inner'>
+        <textarea id = "htmlcon" > </textarea> 
+        
         </div>
-      </div>
-      </Popbox>
+        <button onClick = { copyCode }
+        className = "copyBtn" >Copy Code</button> 
+        
+        </div> 
+        </Popbox>
 
-    <React.StrictMode>
-        <EmailEditor ref={ emailEditorRef } onLoad={ onLoad } />
-    </React.StrictMode>
-</Container>
-);
+        <React.StrictMode>
+        <EmailEditor ref = { emailEditorRef }
+        onLoad = { onLoad }
+        /> 
+        </React.StrictMode> 
+        </Container>
+    );
 };
 
 export default Example;
